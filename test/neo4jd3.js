@@ -1,8 +1,9 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Neo4jd3 = factory());
-})(this, (function () { 'use strict';
+        typeof define === 'function' && define.amd ? define(factory) :
+            (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Neo4jd3 = factory());
+})(this, (function () {
+    'use strict';
 
     function merge(target, source) {
         Object.keys(source).forEach((property) => {
@@ -48,8 +49,8 @@
         // eslint-disable-next-line no-restricted-syntax
         for (const key of Reflect.ownKeys(source)) {
             if (key !== 'constructor'
-          && key !== 'prototype'
-          && key !== 'name'
+                && key !== 'prototype'
+                && key !== 'name'
             ) {
                 const desc = Object.getOwnPropertyDescriptor(source, key);
                 Object.defineProperty(target, key, desc);
@@ -104,7 +105,7 @@
         </g>
      </g>
      */
-     class Nodes {
+    class Nodes {
         constructor() {
 
         }
@@ -190,6 +191,7 @@
                     }
                 })
                 .on('click', function (e, d) {
+
                     const did = d.id;
                     // 点击的时候固定点
                     self.fixNodes(d);
@@ -236,14 +238,14 @@
                             d3.select(this).classed('context-show', false);
                         });
 
-                    
+
 
                     if (!d.properties4show || !d.properties4show.length) return
 
                     // 展示 隐藏属性值
                     const ishowAttr = self.nodes.filter(
                         item => item.labels.includes('属性')
-                              && item.properties.$_parent_id === d.id,
+                            && item.properties.$_parent_id === d.id,
                     );
 
                     if (ishowAttr && ishowAttr.length) {
@@ -269,22 +271,22 @@
 
                     e.stopPropagation();
                 })
-                .on('mouseover', (e, d) => {
-                    // 超出省略的处理tooltip,如果是nodeType的类型为iconfont,那么不超出显示
-                    if (d.nodeType !== 'iconfont') {
-                        const text = d.properties.name;
-                        ishowToolTip = self.calcTextLine(text, self.options.nodeRadius * 2 - 6) > 1;
-                        if (!ishowToolTip) return
-                        self.showToolTips(text);
-                    }
+                // .on('mouseover', (e, d) => {
+                //     // 超出省略的处理tooltip,如果是nodeType的类型为iconfont,那么不超出显示
+                //     if (d.nodeType !== 'iconfont') {
+                //         const text = d.properties.name;
+                //         ishowToolTip = self.calcTextLine(text, self.options.nodeRadius * 2 - 6) > 1;
+                //         if (!ishowToolTip) return
+                //         self.showToolTips(text);
+                //     }
 
 
-                    if (typeof self.options.onNodeMouseEnter === 'function') {
-                        self.options.onNodeMouseover(e, d, d3);
-                    }
+                //     if (typeof self.options.onNodeMouseover === 'function') {
+                //         self.options.onNodeMouseover(e, d, d3);
+                //     }
 
-                    e.stopPropagation();
-                })
+                //     e.stopPropagation();
+                // })
                 .on('mousemove', (e) => {
                     if (!ishowToolTip) return
 
@@ -468,7 +470,7 @@
 
     class NodesPlate {
         constructor() {
-        // 实体边 实体节点 点击了那些实体
+            // 实体边 实体节点 点击了那些实体
             this.entityRelationship = [];
             // this.entityNodes = []
             this.entityExit = [];
@@ -696,7 +698,7 @@
 
         // 隐藏实体周边的属性
         hidePropertiesNodeAndRelationShips(d) {
-        // 只隐藏当前实体的属性
+            // 只隐藏当前实体的属性
             const nodes = this.nodes.filter(
                 item => !item.labels.includes('属性') || item.properties.$_parent_id !== d.id,
             );
@@ -1344,402 +1346,406 @@
         <path class="overlay" />
      </g>
      */
-     
-     class RelationShips {
-         constructor() {
-     
-         }
-     
-         updateRelationships(r, isAttr = false) {
-             if (!isAttr) {
-                 Array.prototype.push.apply(this.relationships, r);
-             } else {
-                 this.relationships = Array.prototype.concat.apply([], r);
-             }
-     
-             this.relationship = this.svgRelationships
-                 .selectAll('.relationship')
-                 .data(this.relationships, d => d.id);
-     
-             const relationshipEnter = this.appendRelationshipToGraph();
-     
-             relationshipEnter.relationship.merge(this.relationship);
-     
-             this.relationshipOutline = this.svg.selectAll('.relationship .outline');
-             relationshipEnter.outline.merge(this.relationshipOutline);
-     
-             this.relationshipOverlay = this.svg.selectAll('.relationship .overlay');
-             relationshipEnter.overlay.merge(this.relationshipOverlay);
-     
-             this.relationshipText = this.svg.selectAll('.relationship .text');
-             relationshipEnter.text.merge(this.relationshipText);
-     
-     
-             this.relationship.exit().remove();
-             this.relationshipOverlay.exit().remove();
-             this.relationshipOutline.exit().remove();
-             this.relationshipText.exit().remove();
-     
-             if (this.relationships.length) {
-                 this.relationship = this.svgRelationships.selectAll('.relationship');
-                 this.relationshipOutline = this.svg.selectAll('.relationship .outline');
-                 this.relationshipOverlay = this.svg.selectAll('.relationship .overlay');
-                 this.relationshipText = this.svg.selectAll('.relationship .text');
-             } else {
-                 this.relationship = undefined;
-                 this.relationshipOutline = undefined;
-                 this.relationshipOverlay = undefined;
-                 this.relationshipText = undefined;
-             }
-         }
-     
-         appendRelationshipToGraph() {
-             const relationship = this.appendRelationship();
-             const text = this.appendTextToRelationship(relationship);
-             const outline = this.appendOutlineToRelationship(relationship);
-             const overlay = this.appendOverlayToRelationship(relationship);
-     
-             return {
-                 outline,
-                 overlay,
-                 relationship,
-                 text,
-             }
-         }
-     
-         appendRelationship() {
-             const self = this;
-             return this.relationship
-                 .enter()
-                 .append('g')
-                 .attr('class', (d) => {
-                     let highlightRelationShip;
-                     let i;
-                     let classes = 'relationship';
-     
-                     if (self.options.highlightRelationShip) {
-                         for (i = 0; i < self.options.highlightRelationShip.length; i++) {
-                             highlightRelationShip = self.options.highlightRelationShip[i];
-     
-                             if (Number(d.id) === Number(highlightRelationShip.id)) {
-                                 classes += ' relationship-highlighted';
-                                 classes += (highlightRelationShip.class || '');
-                                 break
-                             }
-                         }
-                     }
-     
-                     return classes
-                 })
-                 .on('click', function (e) {
-                     d3.select(this)
-                         .selectAll('.text')
-                         .classed('active_text', true);
-     
-                     e.stopPropagation();
-                 })
-                 .on('dblclick', (e, d) => {
-                     if (typeof self.options.onRelationshipDoubleClick === 'function') {
-                         self.options.onRelationshipDoubleClick(d);
-                     }
-     
-                     e.stopPropagation();
-                 })
-                 .on('mouseenter', () => {
-                 })
-         }
-     
-         appendTextToRelationship(r) {
-             return r.append('text')
-                 .attr('class', 'text')
-                 .attr('fill', '#000000')
-                 .attr('font-size', '8px')
-                 .attr('pointer-events', 'none')
-                 .attr('text-anchor', 'middle')
-                 .text(d => d.type)
-         }
-     
-         appendOutlineToRelationship(r) {
-             return r.append('path')
-                 .attr('class', 'outline')
-                 .attr('fill', '#a5abb6')
-                 .attr('stroke', 'none')
-         }
-     
-         appendOverlayToRelationship(r) {
-             return r.append('path')
-                 .attr('class', 'overlay')
-         }
-     
-         // 链接线与点
-         tickRelationships() {
-             this.layoutRelationships();
-     
-             if (this.relationship) {
-                 this.layoutRelationships();
-                 this.relationship.attr('transform', d => `translate(${d.source.x} ${d.source.y}) rotate(${
-                 d.naturalAngle + 180
-             })`);
-     
-                 this.tickRelationshipsTexts();
-                 this.tickRelationshipsOutlines();
-                 this.tickRelationshipsOverlays();
-             }
-         }
-     
-         tickRelationshipsTexts() {
-             this.relationshipText.attr('transform', (rel) => {
-                 if (rel.naturalAngle < 90 || rel.naturalAngle > 270) {
-                     return `rotate(180 ${rel.arrow.midShaftPoint.x} ${rel.arrow.midShaftPoint.y})`;
-                 }
-                 return null;
-             });
-             this.relationshipText.attr('x', rel => rel.arrow.midShaftPoint.x);
-             this.relationshipText.attr(
-                 'y',
-                 // TODO: Make the fontsize and padding dynamic
-                 rel => rel.arrow.midShaftPoint.y + parseFloat(8.5) / 2 - 1,
-             );
-         }
-     
-         tickRelationshipsOutlines() {
-             this.relationship.each(function (relationship) {
-                 const rel = d3.select(this);
-                 const outline = rel.select('.outline');
-                 const text = rel.select('.text');
-                 const textPadding = 8;
-                 const textLength = text.node().getComputedTextLength();
-                 let captionLength = textLength > 0 ? textLength + textPadding : 0;
-     
-                 outline.attr('d', (d) => {
-                     if (captionLength > d.arrow.shaftLength) {
-                         captionLength = d.arrow.shaftLength;
-                     }
-     
-                     return d.arrow.outline(captionLength);
-                 });
-             });
-         }
-     
-         tickRelationshipsOverlays() {
-             this.relationshipOverlay.attr('d', d => d.arrow.overlay(this.options.arrowSize));
-         }
-     
-         layoutRelationships() {
-             const nodePairs = this.groupedRelationships();
-             this.computeGeometryForNonLoopArrows(nodePairs);
-             this.distributeAnglesForLoopArrows(nodePairs, this.relationships);
-     
-             return (() => {
-                 const result = [];
-                 for (const nodePair of Array.from(nodePairs)) {
-                     for (const relationship of Array.from(nodePair.relationships)) {
-                         delete relationship.arrow;
-                     }
-     
-                     const middleRelationshipIndex = (nodePair.relationships.length - 1) / 2;
-                     // 默认的偏移
-                     const defaultDeflectionStep = 30;
-                     // 最大的偏移角度
-                     const maximumTotalDeflection = 150;
-     
-                     const numberOfSteps = nodePair.relationships.length - 1;
-                     const totalDeflection = defaultDeflectionStep * numberOfSteps;
-     
-                     const deflectionStep = totalDeflection > maximumTotalDeflection
-                         ? maximumTotalDeflection / numberOfSteps
-                         : defaultDeflectionStep;
-     
-                     result.push(
-                         // eslint-disable-next-line no-loop-func
-                         (() => {
-                             for (let i = 0; i < nodePair.relationships.length; i++) {
-                                 const relationship = nodePair.relationships[i];
-                                 const { nodeRadius } = this.options;
-                                 // 线宽
-                                 const shaftWidth = this.options.relationshipWidth;
-                                 // 箭头宽
-                                 const headWidth = this.options.arrowSize;
-                                 // 箭头高度
-                                 const headHeight = headWidth;
-     
-                                 if (nodePair.isLoop()) {
-                                     relationship.arrow = new LoopArrow(
-                                         nodeRadius,
-                                         40,
-                                         defaultDeflectionStep,
-                                         shaftWidth,
-                                         headWidth,
-                                         headHeight,
-                                         relationship.captionHeight || 11,
-                                     );
-                                 } else if (i === middleRelationshipIndex) {
-                                     relationship.arrow = new StraightArrow(
-                                         nodeRadius,
-                                         nodeRadius,
-                                         relationship.centreDistance,
-                                         shaftWidth,
-                                         headWidth,
-                                         headHeight,
-                                         relationship.captionLayout || 'external',
-                                     );
-                                 } else {
-                                     let deflection = deflectionStep * (i - middleRelationshipIndex);
-     
-                                     if (nodePair.nodeA !== relationship.source) {
-                                         deflection *= -1;
-                                     }
-     
-                                     relationship.arrow = new ArcArrow(
-                                         nodeRadius,
-                                         nodeRadius,
-                                         relationship.centreDistance,
-                                         deflection,
-                                         shaftWidth,
-                                         headWidth,
-                                         headHeight,
-                                         relationship.captionLayout || 'external',
-                                     );
-                                 }
-                             }
-                         })(),
-                     );
-                 }
-                 return result;
-             })();
-         }
-     
-         // 将点和边组合到一起
-         groupedRelationships() {
-             const groups = {};
-             for (const relationship of Array.from(this.relationships)) {
-                 let nodePair = new NodePair(relationship.source, relationship.target);
-                 // 有相同的nodePair时relationships是做追加的功能
-                 nodePair = groups[nodePair] != null ? groups[nodePair] : nodePair;
-                 nodePair.relationships.push(relationship);
-                 // 注意NodePair的toString方法
-                 groups[nodePair] = nodePair;
-             }
-             return (() => {
-                 const result = [];
-                 for (const ignored in groups) {
-                     const pair = groups[ignored];
-                     result.push(pair);
-                 }
-                 return result;
-             })();
-         }
-     
-         // 计算非循环箭头的几何属性 naturalAngle夹角  centreDistance距离
-         computeGeometryForNonLoopArrows(nodePairs) {
-             const square = distance => distance * distance;
-     
-             return (() => {
-                 const result = [];
-                 for (const nodePair of Array.from(nodePairs)) {
-                     if (!nodePair.isLoop()) {
-                         const dx = nodePair.nodeA.x - nodePair.nodeB.x;
-                         const dy = nodePair.nodeA.y - nodePair.nodeB.y;
-                         // eslint-disable-next-line vars-on-top
-                         const angle = ((Math.atan2(dy, dx) / Math.PI) * 180 + 360) % 360;
-                         // eslint-disable-next-line vars-on-top
-                         const centreDistance = Math.sqrt(square(dx) + square(dy));
-                         result.push(
-                             (() => {
-                                 const result1 = [];
-                                 for (const relationship of Array.from(nodePair.relationships)) {
-                                     // 两点之间的夹角
-                                     relationship.naturalAngle = relationship.target === nodePair.nodeA
-                                         ? (angle + 180) % 360
-                                         : angle;
-                                     // 两点之间的距离
-                                     result1.push((relationship.centreDistance = centreDistance));
-                                 }
-                                 return result1
-                             })(),
-                         );
-                     } else {
-                         result.push(undefined);
-                     }
-                 }
-                 return result
-             })();
-         }
-     
-         // 处理循环的箭头的角度问题
-         distributeAnglesForLoopArrows(nodePairs, relationships) {
-             return (() => {
-                 const result = [];
-                 for (const nodePair of Array.from(nodePairs)) {
-                     if (nodePair.isLoop()) {
-                         let i;
-                         let separation;
-                         let angles = [];
-                         const node = nodePair.nodeA;
-                         for (const relationship of Array.from(relationships)) {
-                             if (!relationship.isLoop()) {
-                                 if (relationship.source === node) {
-                                     angles.push(relationship.naturalAngle);
-                                 }
-                                 if (relationship.target === node) {
-                                     angles.push(relationship.naturalAngle + 180);
-                                 }
-                             }
-                         }
-                         angles = angles.map(a => (a + 360) % 360).sort((a, b) => a - b);
-                         if (angles.length > 0) {
-                             let end; let
-                                 start;
-                             const biggestGap = {
-                                 start: 0,
-                                 end: 0,
-                             };
-                             for (i = 0; i < angles.length; i++) {
-                                 const angle = angles[i];
-                                 start = angle;
-                                 end = i === angles.length - 1 ? angles[0] + 360 : angles[i + 1];
-                                 if (end - start > biggestGap.end - biggestGap.start) {
-                                     biggestGap.start = start;
-                                     biggestGap.end = end;
-                                 }
-                             }
-                             separation = (biggestGap.end - biggestGap.start) / (nodePair.relationships.length + 1);
-                             result.push(
-                                 // eslint-disable-next-line no-loop-func
-                                 (() => {
-                                     const result1 = [];
-                                     for (i = 0; i < nodePair.relationships.length; i++) {
-                                         const relationship = nodePair.relationships[i];
-                                         result1.push(
-                                             (relationship.naturalAngle = (biggestGap.start + (i + 1) * separation - 90) % 360),
-                                         );
-                                     }
-                                     return result1
-                                 })(),
-                             );
-                         } else {
-                             separation = 360 / nodePair.relationships.length;
-     
-                             result.push(
-                                 // eslint-disable-next-line no-loop-func
-                                 (() => {
-                                     const result2 = [];
-                                     for (i = 0; i < nodePair.relationships.length; i++) {
-                                         const relationship = nodePair.relationships[i];
-                                         result2.push((relationship.naturalAngle = i * separation));
-                                     }
-                                     return result2
-                                 })(),
-                             );
-                         }
-                     } else {
-                         result.push(undefined);
-                     }
-                 }
-                 return result
-             })();
-         }
-     }
+
+    class RelationShips {
+        constructor() {
+
+        }
+
+        updateRelationships(r, isAttr = false) {
+            if (!isAttr) {
+                Array.prototype.push.apply(this.relationships, r);
+            } else {
+                this.relationships = Array.prototype.concat.apply([], r);
+            }
+
+            this.relationship = this.svgRelationships
+                .selectAll('.relationship')
+                .data(this.relationships, d => d.id);
+
+            const relationshipEnter = this.appendRelationshipToGraph();
+
+            relationshipEnter.relationship.merge(this.relationship);
+
+            this.relationshipOutline = this.svg.selectAll('.relationship .outline');
+            relationshipEnter.outline.merge(this.relationshipOutline);
+
+            this.relationshipOverlay = this.svg.selectAll('.relationship .overlay');
+            relationshipEnter.overlay.merge(this.relationshipOverlay);
+
+            this.relationshipText = this.svg.selectAll('.relationship .text');
+            relationshipEnter.text.merge(this.relationshipText);
+
+
+            this.relationship.exit().remove();
+            this.relationshipOverlay.exit().remove();
+            this.relationshipOutline.exit().remove();
+            this.relationshipText.exit().remove();
+
+            if (this.relationships.length) {
+                this.relationship = this.svgRelationships.selectAll('.relationship');
+                this.relationshipOutline = this.svg.selectAll('.relationship .outline');
+                this.relationshipOverlay = this.svg.selectAll('.relationship .overlay');
+                this.relationshipText = this.svg.selectAll('.relationship .text');
+            } else {
+                this.relationship = undefined;
+                this.relationshipOutline = undefined;
+                this.relationshipOverlay = undefined;
+                this.relationshipText = undefined;
+            }
+        }
+
+        appendRelationshipToGraph() {
+            const relationship = this.appendRelationship();
+            const text = this.appendTextToRelationship(relationship);
+            const outline = this.appendOutlineToRelationship(relationship);
+            const overlay = this.appendOverlayToRelationship(relationship);
+
+            return {
+                outline,
+                overlay,
+                relationship,
+                text,
+            }
+        }
+
+        appendRelationship() {
+            const self = this;
+            return this.relationship
+                .enter()
+                .append('g')
+                .attr('class', (d) => {
+                    let highlightRelationShip;
+                    let i;
+                    let classes = 'relationship';
+
+                    if (self.options.highlightRelationShip) {
+                        for (i = 0; i < self.options.highlightRelationShip.length; i++) {
+                            highlightRelationShip = self.options.highlightRelationShip[i];
+
+                            if (Number(d.id) === Number(highlightRelationShip.id)) {
+                                classes += ' relationship-highlighted';
+                                classes += (highlightRelationShip.class || '');
+                                break
+                            }
+                        }
+                    }
+
+                    return classes
+                })
+                .on('click', function (e, d) {
+                    // console.log(e)
+                    d3.select(this)
+                        .selectAll('.text')
+                        .classed('active_text', true);
+
+                    if (typeof self.options.onRelationshipClick === 'function') {
+                        self.options.onRelationshipClick(e, d);
+                    }
+
+                    e.stopPropagation();
+                })
+                .on('dblclick', (e, d) => {
+                    if (typeof self.options.onRelationshipDoubleClick === 'function') {
+                        self.options.onRelationshipDoubleClick(d);
+                    }
+
+                    e.stopPropagation();
+                })
+                .on('mouseenter', () => {
+                })
+        }
+
+        appendTextToRelationship(r) {
+            return r.append('text')
+                .attr('class', 'text')
+                .attr('fill', '#000000')
+                .attr('font-size', '8px')
+                .attr('pointer-events', 'none')
+                .attr('text-anchor', 'middle')
+                .text(d => d.type)
+        }
+
+        appendOutlineToRelationship(r) {
+            return r.append('path')
+                .attr('class', 'outline')
+                .attr('fill', '#a5abb6')
+                .attr('stroke', 'none')
+        }
+
+        appendOverlayToRelationship(r) {
+            return r.append('path')
+                .attr('class', 'overlay')
+        }
+
+        // 链接线与点
+        tickRelationships() {
+            this.layoutRelationships();
+
+            if (this.relationship) {
+                this.layoutRelationships();
+                this.relationship.attr('transform', d => `translate(${d.source.x} ${d.source.y}) rotate(${d.naturalAngle + 180
+                    })`);
+
+                this.tickRelationshipsTexts();
+                this.tickRelationshipsOutlines();
+                this.tickRelationshipsOverlays();
+            }
+        }
+
+        tickRelationshipsTexts() {
+            this.relationshipText.attr('transform', (rel) => {
+                if (rel.naturalAngle < 90 || rel.naturalAngle > 270) {
+                    return `rotate(180 ${rel.arrow.midShaftPoint.x} ${rel.arrow.midShaftPoint.y})`;
+                }
+                return null;
+            });
+            this.relationshipText.attr('x', rel => rel.arrow.midShaftPoint.x);
+            this.relationshipText.attr(
+                'y',
+                // TODO: Make the fontsize and padding dynamic
+                rel => rel.arrow.midShaftPoint.y + parseFloat(8.5) / 2 - 1,
+            );
+        }
+
+        tickRelationshipsOutlines() {
+            this.relationship.each(function (relationship) {
+                const rel = d3.select(this);
+                const outline = rel.select('.outline');
+                const text = rel.select('.text');
+                const textPadding = 8;
+                const textLength = text.node().getComputedTextLength();
+                let captionLength = textLength > 0 ? textLength + textPadding : 0;
+
+                outline.attr('d', (d) => {
+                    if (captionLength > d.arrow.shaftLength) {
+                        captionLength = d.arrow.shaftLength;
+                    }
+
+                    return d.arrow.outline(captionLength);
+                });
+            });
+        }
+
+        tickRelationshipsOverlays() {
+            this.relationshipOverlay.attr('d', d => d.arrow.overlay(this.options.arrowSize));
+        }
+
+        layoutRelationships() {
+            const nodePairs = this.groupedRelationships();
+            this.computeGeometryForNonLoopArrows(nodePairs);
+            this.distributeAnglesForLoopArrows(nodePairs, this.relationships);
+
+            return (() => {
+                const result = [];
+                for (const nodePair of Array.from(nodePairs)) {
+                    for (const relationship of Array.from(nodePair.relationships)) {
+                        delete relationship.arrow;
+                    }
+
+                    const middleRelationshipIndex = (nodePair.relationships.length - 1) / 2;
+                    // 默认的偏移
+                    const defaultDeflectionStep = 30;
+                    // 最大的偏移角度
+                    const maximumTotalDeflection = 150;
+
+                    const numberOfSteps = nodePair.relationships.length - 1;
+                    const totalDeflection = defaultDeflectionStep * numberOfSteps;
+
+                    const deflectionStep = totalDeflection > maximumTotalDeflection
+                        ? maximumTotalDeflection / numberOfSteps
+                        : defaultDeflectionStep;
+
+                    result.push(
+                        // eslint-disable-next-line no-loop-func
+                        (() => {
+                            for (let i = 0; i < nodePair.relationships.length; i++) {
+                                const relationship = nodePair.relationships[i];
+                                const { nodeRadius } = this.options;
+                                // 线宽
+                                const shaftWidth = this.options.relationshipWidth;
+                                // 箭头宽
+                                const headWidth = this.options.arrowSize;
+                                // 箭头高度
+                                const headHeight = headWidth;
+
+                                if (nodePair.isLoop()) {
+                                    relationship.arrow = new LoopArrow(
+                                        nodeRadius,
+                                        40,
+                                        defaultDeflectionStep,
+                                        shaftWidth,
+                                        headWidth,
+                                        headHeight,
+                                        relationship.captionHeight || 11,
+                                    );
+                                } else if (i === middleRelationshipIndex) {
+                                    relationship.arrow = new StraightArrow(
+                                        nodeRadius,
+                                        nodeRadius,
+                                        relationship.centreDistance,
+                                        shaftWidth,
+                                        headWidth,
+                                        headHeight,
+                                        relationship.captionLayout || 'external',
+                                    );
+                                } else {
+                                    let deflection = deflectionStep * (i - middleRelationshipIndex);
+
+                                    if (nodePair.nodeA !== relationship.source) {
+                                        deflection *= -1;
+                                    }
+
+                                    relationship.arrow = new ArcArrow(
+                                        nodeRadius,
+                                        nodeRadius,
+                                        relationship.centreDistance,
+                                        deflection,
+                                        shaftWidth,
+                                        headWidth,
+                                        headHeight,
+                                        relationship.captionLayout || 'external',
+                                    );
+                                }
+                            }
+                        })(),
+                    );
+                }
+                return result;
+            })();
+        }
+
+        // 将点和边组合到一起
+        groupedRelationships() {
+            const groups = {};
+            for (const relationship of Array.from(this.relationships)) {
+                let nodePair = new NodePair(relationship.source, relationship.target);
+                // 有相同的nodePair时relationships是做追加的功能
+                nodePair = groups[nodePair] != null ? groups[nodePair] : nodePair;
+                nodePair.relationships.push(relationship);
+                // 注意NodePair的toString方法
+                groups[nodePair] = nodePair;
+            }
+            return (() => {
+                const result = [];
+                for (const ignored in groups) {
+                    const pair = groups[ignored];
+                    result.push(pair);
+                }
+                return result;
+            })();
+        }
+
+        // 计算非循环箭头的几何属性 naturalAngle夹角  centreDistance距离
+        computeGeometryForNonLoopArrows(nodePairs) {
+            const square = distance => distance * distance;
+
+            return (() => {
+                const result = [];
+                for (const nodePair of Array.from(nodePairs)) {
+                    if (!nodePair.isLoop()) {
+                        const dx = nodePair.nodeA.x - nodePair.nodeB.x;
+                        const dy = nodePair.nodeA.y - nodePair.nodeB.y;
+                        // eslint-disable-next-line vars-on-top
+                        const angle = ((Math.atan2(dy, dx) / Math.PI) * 180 + 360) % 360;
+                        // eslint-disable-next-line vars-on-top
+                        const centreDistance = Math.sqrt(square(dx) + square(dy));
+                        result.push(
+                            (() => {
+                                const result1 = [];
+                                for (const relationship of Array.from(nodePair.relationships)) {
+                                    // 两点之间的夹角
+                                    relationship.naturalAngle = relationship.target === nodePair.nodeA
+                                        ? (angle + 180) % 360
+                                        : angle;
+                                    // 两点之间的距离
+                                    result1.push((relationship.centreDistance = centreDistance));
+                                }
+                                return result1
+                            })(),
+                        );
+                    } else {
+                        result.push(undefined);
+                    }
+                }
+                return result
+            })();
+        }
+
+        // 处理循环的箭头的角度问题
+        distributeAnglesForLoopArrows(nodePairs, relationships) {
+            return (() => {
+                const result = [];
+                for (const nodePair of Array.from(nodePairs)) {
+                    if (nodePair.isLoop()) {
+                        let i;
+                        let separation;
+                        let angles = [];
+                        const node = nodePair.nodeA;
+                        for (const relationship of Array.from(relationships)) {
+                            if (!relationship.isLoop()) {
+                                if (relationship.source === node) {
+                                    angles.push(relationship.naturalAngle);
+                                }
+                                if (relationship.target === node) {
+                                    angles.push(relationship.naturalAngle + 180);
+                                }
+                            }
+                        }
+                        angles = angles.map(a => (a + 360) % 360).sort((a, b) => a - b);
+                        if (angles.length > 0) {
+                            let end; let
+                                start;
+                            const biggestGap = {
+                                start: 0,
+                                end: 0,
+                            };
+                            for (i = 0; i < angles.length; i++) {
+                                const angle = angles[i];
+                                start = angle;
+                                end = i === angles.length - 1 ? angles[0] + 360 : angles[i + 1];
+                                if (end - start > biggestGap.end - biggestGap.start) {
+                                    biggestGap.start = start;
+                                    biggestGap.end = end;
+                                }
+                            }
+                            separation = (biggestGap.end - biggestGap.start) / (nodePair.relationships.length + 1);
+                            result.push(
+                                // eslint-disable-next-line no-loop-func
+                                (() => {
+                                    const result1 = [];
+                                    for (i = 0; i < nodePair.relationships.length; i++) {
+                                        const relationship = nodePair.relationships[i];
+                                        result1.push(
+                                            (relationship.naturalAngle = (biggestGap.start + (i + 1) * separation - 90) % 360),
+                                        );
+                                    }
+                                    return result1
+                                })(),
+                            );
+                        } else {
+                            separation = 360 / nodePair.relationships.length;
+
+                            result.push(
+                                // eslint-disable-next-line no-loop-func
+                                (() => {
+                                    const result2 = [];
+                                    for (i = 0; i < nodePair.relationships.length; i++) {
+                                        const relationship = nodePair.relationships[i];
+                                        result2.push((relationship.naturalAngle = i * separation));
+                                    }
+                                    return result2
+                                })(),
+                            );
+                        }
+                    } else {
+                        result.push(undefined);
+                    }
+                }
+                return result
+            })();
+        }
+    }
 
     class TextWrap {
         constructor() {
@@ -1891,7 +1897,7 @@
                 // 是否显示表盘
                 showNodePlate: true,
                 // 箭头宽度
-                arrowSize: 4,
+                arrowSize: 8,
                 // 颜色
                 colors: colors(),
                 // 高亮实体的数据
@@ -1926,6 +1932,7 @@
                 onNodeMouseLeave: undefined,
                 onNodeMouseOut: undefined,
                 onRelationshipDoubleClick: undefined,
+                onRelationshipClick: undefined,
                 onMenuNodeClick: undefined,
                 onIconfontClick: undefined,
                 onGetLegend: undefined,
@@ -2045,7 +2052,7 @@
         }
 
         initSimulation() {
-        // 力学仿真(动画效果)
+            // 力学仿真(动画效果)
 
             // 力模拟的强大功能和灵活性以力函数为中心,力函数可以调整元素的位置和速度,以实现吸引排斥碰撞的效果
             /**
@@ -2058,18 +2065,18 @@
              * 文档: https://www.d3indepth.com/force-layout/
              */
             const simulation = d3.forceSimulation()
-            // 碰撞力 防止节点重叠
+                // 碰撞力 防止节点重叠
                 .force('collide', d3.forceCollide().radius(() => this.options.minCollision).iterations(2))
-            // 电荷力 吸引 排斥
+                // 电荷力 吸引 排斥
                 .force('charge', d3.forceManyBody())
-            // // 弹簧力 将有关系的节点 拉近 推远
+                // // 弹簧力 将有关系的节点 拉近 推远
                 .force('link', d3.forceLink().id(d => d.id))
-            // 创建向心力模型,中心是界面的重点
+                // 创建向心力模型,中心是界面的重点
                 .force('center', d3.forceCenter(
                     this.svg.node().parentElement.parentElement.clientWidth / 2,
                     this.svg.node().parentElement.parentElement.clientHeight / 2,
                 ))
-            // 指定迭代次数并仿真
+                // 指定迭代次数并仿真
                 .on('tick', () => {
                     this.tick();
                 })
