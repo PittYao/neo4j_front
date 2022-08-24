@@ -44,11 +44,11 @@
         }
         
         function getData() {
-            $.get("http://127.0.0.1:8080/user/graph", function(result){
+            $.get("http://127.0.0.1:8080/graph", function(result){
                 console.log(result)
 
 
-                neo4jData.results[0].data[0].graph = result
+                neo4jData.results[0].data[0].graph = result.data
                 console.log(neo4jData.results[0].data[0].graph)
 
                 
@@ -65,12 +65,12 @@
                         console.log( name, status, metaData )
 
                         if (name === 'AttrLink') {
-                            $.get("http://127.0.0.1:8080/user/graph/relationship?id="+metaData.id, function(result){
+                            $.get("http://127.0.0.1:8080/graph?id="+metaData.id+"&nodeType="+metaData.nodeType, function(result){
                                 console.log(result)
                                 let data =  neo4jData.results[0].data[0].graph
                                 // 添加nodes 和 relationships 
-                                data.nodes.push(...result.nodes)
-                                data.relationships.push(...result.relationships)
+                                data.nodes.push(...result.data.nodes)
+                                data.relationships.push(...result.data.relationships)
 
                                 neo4jd3.loadNeo4jData()
 
